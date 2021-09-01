@@ -16,6 +16,12 @@ public:
    int               GetCandles(ENUM_APPLIED_PRICE,const string symbol,ENUM_TIMEFRAMES,int start_pos,int count,double &ret_array[])const;
    int               GetMatchRegionsNumber(ENUM_APPLIED_PRICE,const string symbol,ENUM_TIMEFRAMES,int start_pos,int count,double tolerance,double &prices_array[],int &matchs_array[]);
    double            GetStrongerMatchRegion(ENUM_APPLIED_PRICE,const string symbol,ENUM_TIMEFRAMES,int start_pos,int count,double tolerance);
+   int               GetCandlesCloseSubOpen(const string symbol,ENUM_TIMEFRAMES,int start_pos,int count,double &ret_array[]);
+   double            GetCandlesVariantionAverage(const string symbol,ENUM_TIMEFRAMES,int start_pos,int count);
+private:
+   template<typename T>
+   double              GetArrayAverage(T &array[],int size=-1)const;
+
   };
 
 //+------------------------------------------------------------------+
@@ -75,11 +81,7 @@ double CPriceAction::GetCandlesSizeAverage(const string symbol,ENUM_TIMEFRAMES t
    if(n_candles<1)
       return -1;
    double sum=0;
-   for(int i=0; i<n_candles; i++)
-     {
-      sum+=candles_size[i];
-     }
-   return sum/n_candles;
+   return GetArrayAverage(candles_size);
   }
 
 //+------------------------------------------------------------------+
@@ -91,12 +93,7 @@ double CPriceAction::GetCandlesPriceAverage(ENUM_APPLIED_PRICE applied_price,con
    int num_candles=GetCandles(applied_price,symbol,time_frame,start_pos,count,candles_price);
    if(num_candles<1)
       return -1;
-   double price_sum=0;
-   for(int i=0; i<num_candles; i++)
-     {
-      price_sum+=candles_price[i];
-     }
-   return price_sum/num_candles;
+   return GetArrayAverage(candles_price);
   }
 
 
@@ -175,6 +172,59 @@ double CPriceAction::GetStrongerMatchRegion(ENUM_APPLIED_PRICE applied_price,con
 
 
 
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+int CPriceAction::GetCandlesCloseSubOpen(const string symbol,ENUM_TIMEFRAMES time_frame,int start_pos,int count,double &ret_array[])
+  {
+   int close_size,open_size;
+   double close_prices[],open_prices[];
+   close_size=GetCandles(PRICE_CLOSE,symbol,time_frame,start_pos,count,close_prices);
+   open_size=GetCandles(PRICE_OPEN,symbol,time_frame,start_pos,count,open_prices);
+   if(close_size<1)
+      return -1;
+   if(close_size!=open_size)
+      return -1;
+   int ret_size=ArrayResize(ret_array,close_size);
+   if(ret_size!=close_size)
+      return -1;
+   for(int i=0; i<ret_size; i++)
+     {
+      ret_array[i]=close_prices[i]-open_prices[i];
+     }
+   return ret_size;
+  }
 
 
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double CPriceAction::GetCandlesVariantionAverage(const string symbol,ENUM_TIMEFRAMES time_frame,int start_pos,int count)
+  {
+   double candles_variation[];
+   int candles_size=GetCandlesCloseSubOpen(symbol,time_frame,start_pos,count,candles_variation);
+   if(candles_size<1)
+      return -1;
+   for(int i=0; i<candles_size; i++)
+      candles_variation[i]=MathAbs(candles_variation[i]);
+   return GetArrayAverage(candles_variation);
+  }
+
+//+------------------------------------------------------------------+
+
+template<typename T>
+double CPriceAction::GetArrayAverage(T &array[],int size=-1)const
+  {
+   int array_size=size;
+   if(array_size<1)
+      array_size=ArraySize(array);
+   if(array_size<1)
+      return -1;
+   double sum=0;
+   for(int i=0; i<array_size; i++)
+     {
+      sum+=array[i];
+     }
+   return sum/array_size;
+  }
 //+------------------------------------------------------------------+
