@@ -22,9 +22,14 @@
     * **Description:** The number of candles you want to consider.
 
 * **Class Methods**
+  * **Name:** GetCandles
+    * **Return:** int 
+    * **Parameters:** (ENUM_APPLIED_PRICE,const string symbol,ENUM_TIMEFRAMES,int start_pos,int count,double &ret_array[])
+    * **Description:** Will copy the applied price of the candles sample to the parameter **ret_array**, and will return the number of copied prices. If any error occurs, will return -1.
   * **Name:** GetMaxPrice
-    * **Return:** Double
+    * **Return:** double
     * **Parameters:** (ENUM_APPLIED_PRICE applied_price,const string symbol,ENUM_TIMEFRAMES time_frame,int start_pos,int count) 
     * **Description:** Return the **max** price of the candles sample, the max price is in relation the **applied price**.
   * **Name:** GetMinPrice
     * **Description:** Equal 'GetMaxPrice' method, but return **min** price.
+  
