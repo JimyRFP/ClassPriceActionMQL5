@@ -3,6 +3,8 @@
 //|                                            Rafael Floriani Pinto |
 //|                           https://www.mql5.com/en/users/rafaelfp |
 //+------------------------------------------------------------------+
+#ifndef CPRICEACTIONJIMYRFP
+#define CPRICEACTIONJIMYRFP
 #property copyright "Copyright 2021, JIMYRFP."
 #property link      "https://github.com/JimyRFP"
 class CPriceAction
@@ -228,3 +230,4 @@ double CPriceAction::GetArrayAverage(T &array[],int size=-1)const
    return sum/array_size;
   }
 //+------------------------------------------------------------------+
+#endif
